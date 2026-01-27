@@ -32,7 +32,7 @@
 <div id="map"></div>
 
 <div class="ui-container">
-    <div id="status" class="status-badge">Nereden Alınacaksınız?</div>
+    <div id="status" class="status-badge">Konumunuz Aranıyor...</div>
     
     <div id="resultArea" class="result-container">
         <div class="info-box">
@@ -69,7 +69,22 @@
             map.setView(e.geocode.center, 15);
         }).addTo(map);
 
+    // Otomatik Konum Bulma
     map.locate({setView: true, maxZoom: 16});
+
+    map.on('locationfound', function(e) {
+        if (step === 1 && !startMarker) {
+            startMarker = L.marker(e.latlng).addTo(map).bindPopup("Buradasınız (Kalkış)").openPopup();
+            document.getElementById('status').innerText = "Nereye Gideceksiniz?";
+            document.getElementById('status').style.background = "#0dcaf0";
+            step = 2;
+        }
+    });
+
+    map.on('locationerror', function() {
+        document.getElementById('status').innerText = "Nereden Alınacaksınız?";
+        alert("Konumunuz bulunamadı, lütfen haritadan seçin.");
+    });
 
     function handlePointSelection(latlng) {
         if (step === 1) {
@@ -101,7 +116,6 @@
         var mesafeMetre = p1.distanceTo(p2); 
         var mesafeKm = (mesafeMetre / 1000) * 1.25; 
         
-        // Ücret Mantığı
         var hesaplananUcret = mesafeKm * KM_UCRETI;
         var sonUcret = hesaplananUcret;
         var warningDisplay = "none";

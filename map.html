@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
-    <link rel="icon" type="image/png" href="Gemini_Generated_Image_209ygb209ygb209y.png">
     <style>
         body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8f9fa; }
         #map { height: 60vh; width: 100%; }
@@ -42,7 +41,7 @@
         <div class="info-box price-highlight">
             <span class="label-text">Tahmini Ücret</span>
             <span class="val-text price-val" id="priceText">0 TL</span>
-            <div id="minPriceWarning" class="min-ucret-uyari">* 5 KM altı minimum ücret uygulanmıştır.</div>
+            <div id="minPriceWarning" class="min-ucret-uyari">* Minimum ücret uygulanmıştır.</div>
         </div>
     </div>
 
@@ -55,7 +54,6 @@
 <script>
     var map = L.map('map').setView([36.8841, 30.7056], 13);
     var startMarker, endMarker;
-    var step = 1;
     
     // Sabitler
     const KM_UCRETI = 30;
@@ -63,58 +61,63 @@
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-    var geocoder = L.Control.geocoder({ defaultMarkGeocode: false, placeholder: "Adres yazın..." })
+    // Geocoder ayarı (Sadece varış için çalışacak)
+    var geocoder = L.Control.geocoder({ defaultMarkGeocode: false, placeholder: "Gideceğiniz adresi yazın..." })
         .on('markgeocode', function(e) {
-            handlePointSelection(e.geocode.center);
+            updateDestination(e.geocode.center);
             map.setView(e.geocode.center, 15);
         }).addTo(map);
 
-    // Otomatik Konum Bulma
+    // Otomatik Konum Bulma (Kalkış Noktası)
     map.locate({setView: true, maxZoom: 16});
 
     map.on('locationfound', function(e) {
-        if (step === 1 && !startMarker) {
-            startMarker = L.marker(e.latlng).addTo(map).bindPopup("Buradasınız (Kalkış)").openPopup();
-            document.getElementById('status').innerText = "Nereye Gideceksiniz?";
+        if (!startMarker) {
+            startMarker = L.marker(e.latlng, {draggable: false}).addTo(map)
+                .bindPopup("<b>Buradasınız</b><br>Kalkış Noktası Sabitlendi")
+                .openPopup();
+            
+            document.getElementById('status').innerText = "Nereye Gideceksiniz? (Haritadan Seçin)";
             document.getElementById('status').style.background = "#0dcaf0";
-            step = 2;
         }
     });
 
     map.on('locationerror', function() {
-        document.getElementById('status').innerText = "Nereden Alınacaksınız?";
-        alert("Konumunuz bulunamadı, lütfen haritadan seçin.");
+        document.getElementById('status').innerText = "Konum İzni Gerekli!";
+        alert("Konumunuzu otomatik alamadık. Lütfen sayfayı yenileyip izin verin.");
     });
 
-    function handlePointSelection(latlng) {
-        if (step === 1) {
-            if (startMarker) map.removeLayer(startMarker);
-            startMarker = L.marker(latlng).addTo(map).bindPopup("Kalkış").openPopup();
-            document.getElementById('status').innerText = "Nereye Gideceksiniz?";
-            document.getElementById('status').style.background = "#0dcaf0";
-            step = 2;
-        } else if (step === 2) {
-            if (endMarker) map.removeLayer(endMarker);
-            endMarker = L.marker(latlng).addTo(map).bindPopup("Varış").openPopup();
-            
-            hesapla();
-            
-            document.getElementById('status').innerText = "Rota Hesaplandı!";
-            document.getElementById('status').style.background = "#28a745";
-            document.getElementById('sendBtn').style.display = "block";
-            document.getElementById('resultArea').style.display = "block";
-            step = 1; 
+    // Sadece Varış Noktasını Güncelleyen Fonksiyon
+    function updateDestination(latlng) {
+        if (!startMarker) {
+            alert("Önce konumunuzun bulunmasını bekleyin.");
+            return;
         }
+
+        if (endMarker) map.removeLayer(endMarker);
+        
+        endMarker = L.marker(latlng).addTo(map).bindPopup("Varış Noktası").openPopup();
+        
+        hesapla();
+        
+        document.getElementById('status').innerText = "Rota ve Ücret Hazır!";
+        document.getElementById('status').style.background = "#28a745";
+        document.getElementById('sendBtn').style.display = "block";
+        document.getElementById('resultArea').style.display = "block";
     }
 
-    map.on('click', function(e) { handlePointSelection(e.latlng); });
+    // Tıklama olayı sadece varış noktasını değiştirir
+    map.on('click', function(e) { 
+        updateDestination(e.latlng); 
+    });
 
     function hesapla() {
         var p1 = startMarker.getLatLng();
         var p2 = endMarker.getLatLng();
         
+        // Kuş uçuşu mesafeyi yol mesafesine yaklaştırmak için 1.3 katsayısı (Antalya trafiği/yolları için ideal)
         var mesafeMetre = p1.distanceTo(p2); 
-        var mesafeKm = (mesafeMetre / 1000) * 1.25; 
+        var mesafeKm = (mesafeMetre / 1000) * 1.3; 
         
         var hesaplananUcret = mesafeKm * KM_UCRETI;
         var sonUcret = hesaplananUcret;
@@ -126,7 +129,7 @@
         }
         
         document.getElementById('distanceText').innerText = mesafeKm.toFixed(2) + " KM";
-        document.getElementById('priceText').innerText = sonUcret.toFixed(2) + " TL";
+        document.getElementById('priceText').innerText = Math.round(sonUcret) + " TL";
         document.getElementById('minPriceWarning').style.display = warningDisplay;
     }
 
@@ -138,9 +141,9 @@
         var ucret = document.getElementById('priceText').innerText;
 
         var mesaj = "🚖 *YENİ TAKSİ TALEBİ*%0A%0A" +
-                    "📍 *Kalkış:* https://www.google.com/maps?q=" + s.lat + "," + s.lng + "%0A" +
-                    "🏁 *Varış:* https://www.google.com/maps?q=" + e.lat + "," + e.lng + "%0A%0A" +
-                    "📏 *Mesafe:* " + mesafe + "%0A" +
+                    "📍 *Kalkış Konumu:* https://www.google.com/maps?q=" + s.lat + "," + s.lng + "%0A" +
+                    "🏁 *Varış Konumu:* https://www.google.com/maps?q=" + e.lat + "," + e.lng + "%0A%0A" +
+                    "📏 *Tahmini Mesafe:* " + mesafe + "%0A" +
                     "💰 *Tahmini Ücret:* " + ucret;
 
         window.open("https://wa.me/" + telefonNo + "?text=" + mesaj, '_blank');

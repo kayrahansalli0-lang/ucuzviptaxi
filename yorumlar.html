@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <title>Yorumlar</title>
+   <link rel="icon" type="image/png" href="Gemini_Generated_Image_209ygb209ygb209y.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Müşteri Yorumları - Gezen Tabela</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2 { color: #333; border-bottom: 2px solid #ffcc00; padding-bottom: 10px; }
+        .comment-card { border-bottom: 1px solid #eee; padding: 15px 0; animation: fadeIn 0.5s ease; }
+        .comment-card:last-child { border-bottom: none; }
+        strong { color: #2c3e50; font-size: 1.1em; }
+        p { color: #555; line-height: 1.6; margin: 8px 0; }
+        small { color: #aaa; font-size: 0.85em; }
+        .back-btn { display: inline-block; margin-top: 20px; text-decoration: none; color: #333; font-weight: bold; background: #ffcc00; padding: 10px 20px; border-radius: 5px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Müşteri Deneyimleri</h2>
+    <div id="fullCommentList">Yorumlar yükleniyor, lütfen bekle knk...</div>
+    <a href="index.html" class="back-btn">← Ana Sayfaya Dön</a>
+</div>
+
+<script>
+    // Senin Apps Script linkini buraya kopyala
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyBXE_Mq_G0zvPjVThPlFgsntLmLnB10IlB8oMaxNIaLSkwXWjsrvL1baKcUfjdbFgIyg/exec";
+
+    // İsim maskeleme fonksiyonu
+    function maskName(name) {
+        let parts = name.split(' ');
+        return parts.map(part => {
+            if (part.length <= 2) return part;
+            return part.substring(0, 2) + "*".repeat(part.length - 2);
+        }).join(' ');
+    }
+
+    // Verileri çekme
+    window.onload = function() {
+        fetch(SCRIPT_URL)
+        .then(res => res.json())
+        .then(data => {
+            const list = document.getElementById('fullCommentList');
+            list.innerHTML = ""; // Yükleniyor yazısını sil
+
+            if(data.length === 0) {
+                list.innerHTML = "<p>Henüz yorum yapılmamış knk.</p>";
+                return;
+            }
+
+            // En yeni yorum en üstte görünsün diye reverse yapıyoruz
+            data.reverse().forEach(item => {
+                const masked = maskName(item.userName);
+                const card = document.createElement('div');
+                card.className = 'comment-card';
+                card.innerHTML = `
+                    <strong>${masked}</strong>
+                    <p>${item.userComment}</p>
+                    <small>${new Date(item.date).toLocaleString('tr-TR')}</small>
+                `;
+                list.appendChild(card);
+            });
+        })
+        .catch(err => {
+            document.getElementById('fullCommentList').innerHTML = "Yorumlar çekilemedi, linki kontrol et knk.";
+        });
+    };
+</script>
+
+</body>
+</html>

@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UcuzavipTaxi</title>
+    <link rel="icon" type="image/png" href="Gemini_Generated_Image_209ygb209ygb209y.png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --primary-color: #f39c12; 
+            --dark-color: #2c3e50;
+            --light-bg: #f4f7f6;
+            --white: #ffffff;
+            --whatsapp-green: #25d366;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
+        body { background-color: var(--light-bg); color: var(--dark-color); line-height: 1.6; overflow-x: hidden; }
+
+        header {
+            background: var(--white);
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo { font-weight: 700; font-size: 1.5rem; }
+        .logo span { color: var(--primary-color); }
+
+        .call-btn {
+            background: var(--whatsapp-green);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
+        }
+
+       /* --- Slider (Foto Galeri) Alanı --- */
+ .hero-slider {
+    position: relative;
+    height: 60vh; /* Ekranın %60'ını kaplar, istersen 500px gibi sabit de yapabilirsin */
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out; 
+    z-index: 1; /* Resimler en altta */
+}
+
+.slide.active {
+    opacity: 1;
+}
+
+/* Karartma katmanı (Yazıların okunması için şart) */
+.hero-slider::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4); /* Karartma seviyesi (%40) */
+    z-index: 2; /* Resimlerin üstünde, yazıların altında */
+}
+
+.hero-content {
+    position: relative;
+    z-index: 3; /* En üstte durmalı ki tıklanabilsin ve net görünsün */
+    text-align: center;
+    color: white;
+    width: 100%;
+    max-width: 800px; /* Yazıların çok yayılmaması için */
+    padding: 0 20px;
+}
+
+.hero-content h1 { 
+    font-size: 3rem; /* Mobilde çok büyük gelirse 2.5rem yaparsın */
+    margin: 0 0 1rem 0; 
+    text-shadow: 2px 2px 10px rgba(0,0,0,0.7); 
+    font-weight: bold;
+}
+
+.hero-content p { 
+    font-size: 1.3rem; 
+    text-shadow: 1px 1px 5px rgba(0,0,0,0.7); 
+    margin: 0;
+}
+        /* --- Rezervasyon Barı --- */
+        .booking-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            transform: translateY(-50px);
+            position: relative;
+            z-index: 10;
+        }
+
+        .booking-bar {
+            background: var(--white);
+            padding: 25px;
+            border-radius: 15px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            width: 90%;
+            max-width: 1000px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .input-group { position: relative; display: flex; align-items: center; }
+        .input-group i.main-icon { position: absolute; left: 15px; color: var(--primary-color); }
+
+        .locate-btn {
+            position: absolute;
+            right: 10px;
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px 40px 15px 45px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .book-now {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        #result-area {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 1000px;
+            margin-top: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .features {
+            padding: 50px 5%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card { background: white; padding: 30px; border-radius: 15px; text-align: center; }
+        .feature-card i { font-size: 2.5rem; color: var(--primary-color); margin-bottom: 15px; }
+
+        @media (max-width: 768px) {
+            .hero-content h1 { font-size: 1.8rem; }
+            .booking-container { transform: translateY(20px); }
+        }
+        @media (max-width: 768px) {
+    .hero-content h1 { font-size: 2rem; }
+    .hero-content p { font-size: 1rem; }
+}@media (max-width: 768px) {
+    /* Yan yana duran elemanları alt alta getirir */
+    header, .hero-content, .booking-bar, .features {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    /* Yazı boyutlarını küçültür ki ekrana sığsın */
+    h1 {
+        font-size: 1.8rem !important;
+    }
+
+    /* Resimleri ve kutuları ekran genişliğine yayar */
+    .feature-card, .booking-container {
+        width: 90% !important;
+        margin: 10px auto;
+    }
+
+    /* Slider yüksekliğini mobilde biraz küçültebilirsin */
+    .hero-slider {
+        height: 40vh !important;
+    }
+}
+    </style>
+    <style>
+        .duyuru-bandi {
+    width: 100%;
+    background-color: #e63946; /* Canlı bir kırmızı */
+    color: white;
+    padding: 15px 0;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 4px 15px rgba(230, 57, 70, 0.3); /* Hafif gölge ile derinlik */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    border-top: 2px solid #b91c1c;
+    border-bottom: 2px solid #b91c1c;
+}
+
+.kayan-metin {
+    display: inline-block;
+    white-space: nowrap;
+    font-size: 1.2rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    animation: akis 20s linear infinite;
+    cursor: pointer;
+}
+
+/* Fare üzerine gelince durması için */
+.duyuru-bandi:hover .kayan-metin {
+    animation-play-state: paused;
+}
+
+@keyframes akis {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+}
+
+/* Yazının arkasına hafif bir parıltı efekti */
+.kayan-metin:after {
+    content: " • ";
+    margin: 0 20px;
+}
+        .comment-container {
+            max-width: 500px;
+            margin: 20px auto;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .comment-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .comment-form input, .comment-form textarea {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .comment-form button {
+            background-color: #ffcc00;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+
+        /* Liste artık burada olmayacağı için kart stillerine gerek yok ama dursun zararı olmaz */
+        .comment-card {
+            border-bottom: 1px solid #eee;
+            padding: 15px 5px;
+        }
+        .site-footer {
+    background-color: #333;
+    color: white;
+    padding: 30px 0 10px 0;
+    margin-top: 50px;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.footer-content {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    flex-wrap: wrap; /* Mobilde alt alta gelmesi için */
+    gap: 20px;
+}
+
+.footer-section {
+    flex: 1;
+    min-width: 250px;
+}
+
+.footer-section h4 {
+    color: #ffcc00; /* Gezen Tabela sarısı */
+    margin-bottom: 15px;
+    border-bottom: 1px solid #555;
+    padding-bottom: 5px;
+    display: inline-block;
+}
+
+.footer-section p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #ccc;
+}
+
+.instagram-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.instagram-link:hover {
+    color: #ffcc00;
+}
+
+.footer-bottom {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 10px;
+    border-top: 1px solid #444;
+    font-size: 0.75rem;
+    color: #888;
+}
+.location-box {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.map-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background-color: #ffcc00; /* Gezen Tabela Sarısı */
+    color: #333;
+    text-decoration: none;
+    padding: 15px 25px;
+    border-radius: 50px;
+    font-weight: bold;
+    font-family: 'Segoe UI', sans-serif;
+    box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.map-btn i {
+    font-size: 1.5rem;
+    color: #d40000; /* Konum ikonu klasik kırmızı */
+}
+
+.map-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(255, 204, 0, 0.5);
+    background-color: #f7c600;
+}
+
+.map-btn span {
+    font-size: 1.1rem;
+}
+@media (max-width: 768px) {
+    .hero-content h1 { font-size: 2rem; }
+    .hero-content p { font-size: 1rem; }
+}
+.language-switcher {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 5px;
+}
+
+.language-switcher img {
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+    border-radius: 50%; /* Yuvarlak bayraklar */
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    object-fit: cover;
+}
+
+.language-switcher img:hover {
+    border-color: #ffcc00; /* Gezen Tabela sarısı */
+    transform: scale(1.2);
+    
+}
+@media (max-width: 768px) {
+    /* Yan yana duran elemanları alt alta getirir */
+    header, .hero-content, .booking-bar, .features {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    /* Yazı boyutlarını küçültür ki ekrana sığsın */
+    h1 {
+        font-size: 1.8rem !important;
+    }
+
+    /* Resimleri ve kutuları ekran genişliğine yayar */
+    .feature-card, .booking-container {
+        width: 90% !important;
+        margin: 10px auto;
+    }
+
+    /* Slider yüksekliğini mobilde biraz küçültebilirsin */
+    .hero-slider {
+        height: 40vh !important;
+    }
+}
+/* Kutunun genel yerleşimi */
+.loca-box {
+    margin: 20px 0;
+    text-align: center;
+}
+
+/* Butonun ana stili */
+.ma-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: linear-gradient(135deg, #1a1a1a 0%, #333 100%); /* Hafif geçişli koyu arka plan */
+    color: #ffffff;
+    text-decoration: none;
+    padding: 12px 25px;
+    border-radius: 50px; /* Tam yuvarlak köşeler */
+    border: 2px solid #ffcc00; /* Senin meşhur altın sarısı kenarlık */
+    font-family: 'Segoe UI', sans-serif;
+    font-weight: 600;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 4px 15px rgba(255, 204, 0, 0.15);
+}
+
+/* İkonun stili */
+.ma-btn i {
+    font-size: 1.4rem;
+    color: #ffcc00; /* İkon sarı */
+    transition: transform 0.3s ease;
+}
+
+/* Üzerine gelince (Hover) olacaklar */
+.ma-btn:hover {
+    background: #ffcc00; /* Arka plan sarı olur */
+    color: #1a1a1a; /* Yazı koyu olur */
+    transform: translateY(-5px) scale(1.05); /* Hafif yukarı zıplar */
+    box-shadow: 0 8px 25px rgba(255, 204, 0, 0.4);
+}
+
+/* Üzerine gelince ikonun hareketi */
+.ma-btn:hover i {
+    color: #1a1a1a;
+    transform: rotate(15deg); /* İkon hafif yan yatar */
+}
+
+/* Yazı stili */
+.ma-btn span {
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+}
+
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <a href="sayfa.html">
+            <img src="Gemini_Generated_Image_209ygb209ygb209y.png" alt="Antalya VIP Taksi Logo" width="100" height="100">
+        </a>
+    </div>
+
+    <a href="https://wa.me/905398120995" class="call-btn">
+        <i class="fab fa-whatsapp"></i> <span data-key="btn_whatsapp">Hızlı Çağır</span>
+    </a>
+
+    <div class="language-switcher">
+        <img src="https://flagcdn.com/w40/tr.png" alt="Turkish" onclick="translatePage('tr')" style="cursor:pointer; width:30px; margin-right:5px;">
+        <img src="https://flagcdn.com/w40/gb.png" alt="English" onclick="translatePage('en')" style="cursor:pointer; width:30px; margin-right:5px;">
+        <img src="https://flagcdn.com/w40/ru.png" alt="Russian" onclick="translatePage('ru')" style="cursor:pointer; width:30px;">
+    </div>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <div class="location-box">
+        <a href="map.html" target="_blank" class="map-btn">
+            <i class="fas fa-map-marker-alt"></i>
+            <span data-key="btn_location">Şu anki Konumumdan başka bir yere gitmek istiyorum</span>
+        </a>
+    </div>
+</header>
+
+
+<div class="hero-slider">
+    <div class="slide active" style="background-image: url('Gemini_Generated_Image_yatnl3yatnl3yatn.png');"></div>
+    <div class="slide active" style="background-image: url('Gemini_Generated_Image_bfv60fbfv60fbfv6.png');"></div>
+    <div class="slide" style="background-image: url('https://images.unsplash.com/photo-1549923746-c502d488b3ea?auto=format&fit=crop&w=1500&q=80');"></div>
+
+    <div class="hero-content">
+        <h1 data-key="hero_title">Antalya Güvenli Ulaşım Rehberiniz</h1>
+        <p data-key="hero_subtitle">Havalimanı ve Şehir İçi Transferlerde Sabit Fiyat Garantisi</p>
+    </div>
+</div>
+
+    
+
+<div class="booking-container">
+    <div class="booking-bar">
+        <div class="input-group">
+            <i class="fas fa-map-marker-alt main-icon"></i>
+            <input type="text" id="origin" data-key="input_from" placeholder="Nereden?">
+            <button class="locate-btn" onclick="getCurrentLocation()" title="Konumumu Bul">
+                <i class="fas fa-crosshairs"></i>
+            </button>
+        </div>
+        <div class="input-group">
+            <i class="fas fa-flag-checkered main-icon"></i>
+            <input type="text" id="destination" data-key="input_to" placeholder="Nereye? (Örn: Lara, Belek)">
+        </div>
+        <button class="book-now" data-key="btn_calculate" onclick="calculateRoute()">Fiyat Hesapla</button>
+    </div>
+
+    <div id="result-area">
+        <h3 data-key="result_title" style="color:var(--primary-color)">Yolculuk Özeti</h3>
+        <p id="route-info" style="font-weight: 700; font-size: 1.2rem; margin: 10px 0;"></p>
+        <p id="distance-text">Mesafe: -- km</p>
+        <h2 id="price-text" style="font-size: 2.5rem; margin: 15px 0;">0 TL</h2>
+        <button onclick="sendWhatsApp()" style="background-color: var(--whatsapp-green); color: white; border: none; padding: 15px 35px; border-radius: 50px; font-size: 1.1rem; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 10px; margin: 20px auto;">
+            <i class="fab fa-whatsapp"></i> <span data-key="btn_confirm">WhatsApp'tan Onayla</span>
+        </button>
+    </div>
+</div>
+<div class="duyuru-bandi">
+    <div class="kayan-metin">
+        5 km² altı mesafelerde sabit tutar 150 tl'dir
+    </div>
+</div>
+
+<section class="features">
+    <div class="feature-card">
+        <i class="fas fa-tags"></i>
+        <h3 data-key="card_title_1">Ekonomik Fiyat</h3>
+        <p data-key="card_text_1">Her bütçeye uygun sabit fiyatlı transfer seçenekleri.</p>
+    </div>
+    <div class="feature-card">
+        <i class="fas fa-clock"></i>
+        <h3 data-key="card_title_2">7/24 Kesintisiz</h3>
+        <p data-key="card_text_2">Günün her saati Antalya'nın her yerindeyiz.</p>
+    </div>
+    <div class="feature-card">
+        <i class="fas fa-user-shield"></i>
+        <h3 data-key="card_title_3">Lisanslı Şoförler</h3>
+        <p data-key="card_text_3">Güvenli ve profesyonel bir yolculuk deneyimi.</p>
+    </div>
+</section>
+<div class="loca-box">
+        <a href="ldas.html" target="_blank" class="ma-btn">
+            <i class=""></i>
+            <span>Hava Durumları</span>
+        </a>
+    </div>
+<div class="comment-container">
+    <h3 data-key="review_title">Müşteri Deneyimleri</h3>
+    <div class="comment-form">
+        <input type="text" id="userName" data-key="review_placeholder_name" placeholder="Adınız Soyadınız">
+        <textarea id="userComment" data-key="review_placeholder_text" placeholder="Deneyiminizi paylaşın..."></textarea>
+        <button onclick="addComment()" data-key="review_btn">Yorum Gönder</button>
+    </div>
+    <div style="text-align: center;">
+        <a href="yorumlar.html" data-key="see_all_reviews" style="color: #666; font-weight: bold; text-decoration: none; font-size: 0.9rem;">
+            Tüm Yorumları Gör (Okumak için tıkla) →
+        </a>
+    </div>
+</div>
+
+<footer class="site-footer">
+    <div class="footer-content">
+        <div class="footer-section about">
+            <h4 data-key="footer_about_title">Gezen Tabela Hakkında</h4>
+            <p data-key="footer_about_text">Siz gezerken reklamınız da gezsin! Bisikletli reklam modelimizle markanızı şehrin her sokağına taşıyoruz. Yenilikçi ve çevre dostu reklamcılığın adresi.</p>
+        </div>
+        <div class="footer-section links">
+            <h4 data-key="footer_social_title">Bizi Takip Et</h4>
+            <div class="social-icons">
+                <a href="https://instagram.com/gezentabela" target="_blank" class="instagram-link">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg" alt="Instagram" width="24">
+                    <span>@viptaxi</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        &copy; 2026 Gezen Tabela | <span data-key="rights_reserved">Tüm Hakları Saklıdır.</span>
+    </div>
+</footer>
+
+<script>
+    // --- SLIDER MANTIĞI ---
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+
+    function nextSlide() {
+        slides[currentSlide].classList.remove('active');
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].classList.add('active');
+    }
+
+    // 4 saniyede bir fotoğrafı değiştir
+    setInterval(nextSlide, 4000);
+
+    // --- HESAPLAMA MANTIĞI ---
+    const TELEFON_NUMARASI = "905398120995"; 
+    const ACILIS_UCRETI = 30; 
+    const KM_BIRIM_FIYATI = 28;
+
+    let state = {
+        nereden: "",
+        nereye: "",
+        mesafe: 0,
+        fiyat: 0,
+        startLat: null,
+        startLon: null
+    };
+
+    function getCurrentLocation() {
+        if (navigator.geolocation) {
+            document.getElementById('origin').placeholder = "Konum alınıyor...";
+            navigator.geolocation.getCurrentPosition(function(position) {
+                state.startLat = position.coords.latitude;
+                state.startLon = position.coords.longitude;
+                document.getElementById('origin').value = "Güncel Konumum";
+            }, function() {
+                alert("Konum izni verilmedi.");
+            });
+        }
+    }
+
+    function getDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; 
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+    }
+
+    async function calculateRoute() {
+        state.nereden = document.getElementById('origin').value;
+        state.nereye = document.getElementById('destination').value;
+
+        if (!state.nereden || !state.nereye) {
+            alert("Lütfen alanları doldur knk!");
+            return;
+        }
+
+        try {
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${state.nereye},Antalya`);
+            const data = await response.json();
+            
+            if (data.length > 0) {
+                const destLat = data[0].lat;
+                const destLon = data[0].lon;
+                const sLat = state.startLat || 36.8841; 
+                const sLon = state.startLon || 30.7056;
+
+                const kusUcusu = getDistance(sLat, sLon, destLat, destLon);
+                state.mesafe = (kusUcusu * 1.25).toFixed(1); 
+                state.fiyat = ACILIS_UCRETI + (state.mesafe * KM_BIRIM_FIYATI);
+
+                document.getElementById('result-area').style.display = 'block';
+                document.getElementById('route-info').innerText = `${state.nereden} ➜ ${state.nereye}`;
+                document.getElementById('distance-text').innerText = `Tahmini Mesafe: ${state.mesafe} km`;
+                document.getElementById('price-text').innerText = `${Math.round(state.fiyat)} TL`;
+                document.getElementById('result-area').scrollIntoView({ behavior: 'smooth' });
+            } else {
+                alert("Gidilecek yeri bulamadım knk.");
+            }
+        } catch (error) {
+            alert("Hata oluştu.");
+        }
+    }
+
+    function sendWhatsApp() {
+        const googleLink = state.startLat ? `https://www.google.com/maps?q=${state.startLat},${state.startLon}` : "Belirtilmedi";
+        const mesaj = `🚖 *Antalya Taksi Talebi*%0A%0A` +
+                      `📍 *Nereden:* ${state.nereden}%0A` +
+                      `🏁 *Nereye:* ${state.nereye}%0A` +
+                      `📏 *Mesafe:* ${state.mesafe} km%0A` +
+                      `💰 *Fiyat:* ${Math.round(state.fiyat)} TL%0A` +
+                      `🗺️ *Konum:* ${googleLink}`;
+        window.open(`https://wa.me/${TELEFON_NUMARASI}?text=${mesaj}`, '_blank');
+    }
+</script>
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyBXE_Mq_G0zvPjVThPlFgsntLmLnB10IlB8oMaxNIaLSkwXWjsrvL1baKcUfjdbFgIyg/exec";
+
+function addComment() {
+    const nameInput = document.getElementById('userName');
+    const commentInput = document.getElementById('userComment');
+
+    if (nameInput.value === "" || commentInput.value === "") {
+        alert("Lütfen tüm alanları doldur be kanka!");
+        return;
+    }
+
+    const data = {
+        userName: nameInput.value,
+        userComment: commentInput.value
+    };
+
+    // Google Tablo'ya gönder
+    fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors', 
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    .then(() => {
+        // Formu temizle ve bilgi ver
+        nameInput.value = "";
+        commentInput.value = "";
+        alert("Yorumun başarıyla gönderildi! Diğer sayfadan görebilirsin.");
+    })
+    .catch(err => {
+        console.error("Hata oluştu:", err);
+        alert("Bir hata oluştu knk.");
+    });
+}
+const translations = {
+    'tr': {
+        'btn_whatsapp': 'Hızlı Çağır',
+        'btn_location': 'Şu anki Konumumdan başka bir yere gitmek istiyorum',
+        'hero_title': 'Antalya Güvenli Ulaşım Rehberiniz',
+        'hero_subtitle': 'Havalimanı ve Şehir İçi Transferlerde Sabit Fiyat Garantisi',
+        'input_from': 'Nereden?',
+        'input_to': 'Nereye? (Örn: Lara, Belek)',
+        'btn_calculate': 'Fiyat Hesapla',
+        'result_title': 'Yolculuk Özeti',
+        'btn_confirm': 'WhatsApp\'tan Onayla',
+        'card_title_1': 'Ekonomik Fiyat',
+        'card_text_1': 'Her bütçeye uygun sabit fiyatlı transfer seçenekleri.',
+        'card_title_2': '7/24 Kesintisiz',
+        'card_text_2': 'Günün her saati Antalya\'nın her yerindeyiz.',
+        'card_title_3': 'Lisanslı Şoförler',
+        'card_text_3': 'Güvenli ve profesyonel bir yolculuk deneyimi.',
+        'review_title': 'Müşteri Deneyimleri',
+        'review_placeholder_name': 'Adınız Soyadınız',
+        'review_placeholder_text': 'Deneyiminizi paylaşın...',
+        'review_btn': 'Yorum Gönder',
+        'see_all_reviews': 'Tüm Yorumları Gör (Okumak için tıkla) →',
+        'footer_about_title': 'Vip Taxi Hakkında',
+        'footer_about_text': 'Antalya’nın eşsiz güzelliklerini keşfederken konforunuzdan ödün vermeyin. VIP Taxi olarak, şehir içi ulaşım ve havalimanı transferlerinde standartların ötesinde bir hizmet sunuyoruz..',
+        'footer_social_title': 'Bizi Takip Et',
+        'rights_reserved': 'Tüm Hakları Saklıdır.'
+        
+        
+    },
+    'en': {
+        'btn_whatsapp': 'Quick Call',
+        'btn_location': 'I want to move to a different location than my current location.',
+        'hero_title': 'Safe Transport Guide in Antalya',
+        'hero_subtitle': 'Fixed Price Guarantee for Transfers',
+        'input_from': 'From Where?',
+        'input_to': 'To Where? (Ex: Lara, Belek)',
+        'btn_calculate': 'Calculate Price',
+        'result_title': 'Trip Summary',
+        'btn_confirm': 'Confirm on WhatsApp',
+        'card_title_1': 'Affordable Price',
+        'card_text_1': 'Fixed price transfer options for every budget.',
+        'card_title_2': '24/7 Service',
+        'card_text_2': 'Everywhere in Antalya, 24/7.',
+        'card_title_3': 'Licensed Drivers',
+        'card_text_3': 'Safe and professional travel experience.',
+        'review_title': 'Customer Reviews',
+        'review_placeholder_name': 'Full Name',
+        'review_placeholder_text': 'Share your experience...',
+        'review_btn': 'Send Comment',
+        'see_all_reviews': 'See All Reviews (Click to read) →',
+        'footer_about_title': 'About Vip Taxi',
+        'footer_about_text': 'Dont compromise on comfort while exploring the unique beauties of Antalya. At VIP Taxi, we offer services that surpass the standards of public transportation and airport transfers.',
+        'footer_social_title': 'Follow Us',
+        'rights_reserved': 'All Rights Reserved.'
+    },
+    'ru': {
+        'btn_whatsapp': 'Быстрый вызов',
+        'btn_location': 'Я хочу переехать в другое место, отличное от того, где я сейчас живу.',
+        'hero_title': 'Ваш гид по транспорту в Анталии',
+        'hero_subtitle': 'Фиксированная цена на трансфер',
+        'input_from': 'Откуда?',
+        'input_to': 'Куда? (Напр: Лара, Белек)',
+        'btn_calculate': 'Узнать цену',
+        'result_title': 'Итог поездки',
+        'btn_confirm': 'Подтвердить в WhatsApp',
+        'card_title_1': 'Выгодная цена',
+        'card_text_1': 'Трансфер по фиксированной цене на любой бюджет.',
+        'card_title_2': '24/7 Сервис',
+        'card_text_2': 'В любом месте Анталии, круглосуточно.',
+        'card_title_3': 'Лицензированные водители',
+        'card_text_3': 'Безопасный и профессиональный опыт.',
+        'review_title': 'Отзывы клиентов',
+        'review_placeholder_name': 'Ваше имя',
+        'review_placeholder_text': 'Поделитесь опытом...',
+        'review_btn': 'Отправить',
+        'see_all_reviews': 'Посмотреть все отзывы →',
+        'footer_about_title': 'О компании Vip Taxi',
+        'footer_about_text': 'Не жертвуйте комфортом, исследуя уникальные красоты Анталии. В VIP Taxi мы предлагаем услуги, превосходящие стандарты городского транспорта и трансферов в аэропорт.',
+        'footer_social_title': 'Подписывайтесь на нас',
+        'rights_reserved': 'Все права защищены.'
+    }
+};
+
+function translatePage(lang) {
+    document.querySelectorAll('[data-key]').forEach(element => {
+        const key = element.getAttribute('data-key');
+        if (translations[lang] && translations[lang][key]) {
+            if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                element.setAttribute('placeholder', translations[lang][key]);
+            } else {
+                element.innerText = translations[lang][key];
+            }
+        }
+    });
+    localStorage.setItem('selectedLang', lang);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const savedLang = localStorage.getItem('selectedLang') || 'tr';
+    translatePage(savedLang);
+});
+</script>
+<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+</body>
+</html>

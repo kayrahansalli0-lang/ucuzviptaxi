@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Türkiye'nin 15 Şehri Hava Durumu (Garantili Yöntem)</title>
+      <link rel="icon" type="image/png" href="Gemini_Generated_Image_209ygb209ygb209y.png">
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; }
+        .city-card { background-color: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 15px; padding: 15px; }
+        .city-name { font-size: 1.5em; font-weight: bold; color: #333; }
+        .weather-info { font-size: 1.2em; color: #555; }
+    </style>
+    <style>
+    /* GENEL AYARLAR */
+    body { 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        background-color: #e9ecef; /* Açık gri arka plan */
+        padding: 40px; 
+        margin: 0;
+        color: #343a40;
+        text-align: center;
+    }
+    h1 {
+        color: #007bff; /* Mavi başlık */
+        margin-bottom: 30px;
+        border-bottom: 3px solid #007bff;
+        display: inline-block;
+        padding-bottom: 10px;
+    }
+
+    /* KARTLARI TAŞIYAN ANA KONTEYNER */
+    #weather-container {
+        display: flex;
+        flex-wrap: wrap; /* Kartlar alt alta geçsin */
+        justify-content: center; /* Ortala */
+        gap: 20px; /* Kartlar arası boşluk */
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /* ŞEHİR KARTININ STİLİ */
+    .city-card { 
+        background-color: #ffffff; /* Beyaz kart */
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* Hafif gölge */
+        padding: 20px; 
+        width: 250px; /* Sabit kart genişliği */
+        text-align: left;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .city-card:hover {
+        transform: translateY(-5px); /* Üzerine gelince hafifçe yukarı kaydır */
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    }
+
+    /* BİLGİ ALANLARI */
+    .city-name { 
+        font-size: 1.8em; 
+        font-weight: 700;
+        color: #212529; /* Koyu şehir adı */
+        margin-bottom: 10px;
+        border-bottom: 1px dashed #ced4da;
+        padding-bottom: 5px;
+    }
+    .weather-info { 
+        font-size: 1.1em; 
+        color: #495057;
+        line-height: 1.6;
+    }
+    .weather-info span {
+        font-weight: bold;
+        color: #007bff; /* Mavi vurgu */
+    }
+</style>
+</head>
+<body>
+
+    <h1>Türkiye'nin 15 Önemli Şehri Hava Durumu</h1>
+
+    <div id="weather-container">Veriler Yükleniyor...</div>
+
+    <script>
+        const API_KEY = '396dbc125c7e4bf04b254697e6e08425'; // Senin API Anahtarın
+        const CITIES = [
+            "Istanbul,tr", "Ankara,tr", "Izmir,tr", "Bursa,tr", "Adana,tr",
+            "Antalya,tr", "Konya,tr", "Gaziantep,tr", "Kocaeli,tr", "Mersin,tr",
+            "Diyarbakir,tr", "Kayseri,tr", "Eskisehir,tr", "Samsun,tr", "Erzurum,tr"
+        ];
+        
+        const container = document.getElementById('weather-container');
+        
+        // Şehirler için ayrı ayrı API çağrısı yapan asenkron fonksiyon
+        async function fetchWeatherForCities() {
+            container.innerHTML = ''; // Yükleniyor yazısını temizle
+            const fetchPromises = CITIES.map(city => {
+                const API_URL = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&lang=tr&appid=${API_KEY}`;
+                
+                // Her şehir için fetch (veri çekme) işlemini başlat
+                return fetch(API_URL)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Veri çekilemedi: ${city}`);
+                        }
+                        return response.json();
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        return { name: city.split(',')[0], error: 'Hata' }; // Hata durumunda şehir adını döndür
+                    });
+            });
+
+            // Tüm sözlerin (promise) tamamlanmasını bekle
+            const results = await Promise.all(fetchPromises);
+
+            let htmlContent = '';
+
+            results.forEach(city => {
+                if (city.error) {
+                    htmlContent += `<div class="city-card"><div class="city-name">${city.name}</div><div class="weather-info">Veri çekilemedi.</div></div>`;
+                } else {
+                    const sicaklik = Math.round(city.main.temp);
+                    const durum = city.weather[0].description;
+                    const ruzgar = Math.round(city.wind.speed * 3.6); // m/s'yi km/h'ye çevirir
+                    
+                    htmlContent += `
+                        <div class="city-card">
+                            <div class="city-name">${city.name}</div>
+                            <div class="weather-info">
+                                🌡️ Sıcaklık: ${sicaklik}°C<br>
+                                ☁️ Durum: ${durum}<br>
+                                💨 Rüzgar Hızı: ${ruzgar} km/saat
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            container.innerHTML = htmlContent;
+        }
+
+        fetchWeatherForCities();
+    </script>
+</body>
+</html>

@@ -623,7 +623,7 @@
 </footer>
 
 <script>
-    // --- SLIDER MANTIĞI ---
+    // --- SLIDER MANTIĞI (Aynen Kaldı) ---
     let currentSlide = 0;
     const slides = document.querySelectorAll('.slide');
 
@@ -633,7 +633,6 @@
         slides[currentSlide].classList.add('active');
     }
 
-    // 4 saniyede bir fotoğrafı değiştir
     setInterval(nextSlide, 4000);
 
     // --- HESAPLAMA MANTIĞI ---
@@ -694,7 +693,14 @@
 
                 const kusUcusu = getDistance(sLat, sLon, destLat, destLon);
                 state.mesafe = (kusUcusu * 1.25).toFixed(1); 
-                state.fiyat = ACILIS_UCRETI + (state.mesafe * KM_BIRIM_FIYATI);
+
+                // --- 5 KM ALTI SABİT ÜCRET KONTROLÜ ---
+                if (state.mesafe < 5) {
+                    state.fiyat = 150; // Kısa mesafe koruması
+                } else {
+                    state.fiyat = ACILIS_UCRETI + (state.mesafe * KM_BIRIM_FIYATI);
+                }
+                // --------------------------------------
 
                 document.getElementById('result-area').style.display = 'block';
                 document.getElementById('route-info').innerText = `${state.nereden} ➜ ${state.nereye}`;
